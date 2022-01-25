@@ -19,8 +19,9 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "net.fabricmc.example.ExampleMod"
-    ]
+      "ru.aiefu.rss.RSS"
+    ],
+    "client": ["ru.aiefu.rss.RSSClient"]
   },
   "mixins": [
     "modid.mixins.json"
