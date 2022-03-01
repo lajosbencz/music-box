@@ -10,9 +10,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class RemoteStream implements AudioStream {
+    private static final int mcs3 = RSS.PCM_MONO_LE.maximumChunkSize() * 3;
 
     private final AudioInputStream stream;
-    private final byte[] buf = new byte[RSS.PCM_MONO_BE.maximumChunkSize()];
+    private final byte[] buf = new byte[RSS.PCM_MONO_LE.maximumChunkSize()];
 
     public RemoteStream(AudioInputStream stream){
         this.stream = stream;
@@ -25,7 +26,7 @@ public class RemoteStream implements AudioStream {
 
     @Override
     public ByteBuffer read(int i) {
-        ByteBuffer buffer = BufferUtils.createByteBuffer(RSS.PCM_MONO_BE.maximumChunkSize() * 3);
+        ByteBuffer buffer = BufferUtils.createByteBuffer(mcs3);
         int r = 0;
         while (r < 3){
             r++;
