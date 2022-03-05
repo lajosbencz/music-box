@@ -22,7 +22,11 @@ public class NetworkHandler {
 
     public static final ResourceLocation start_on_client = new ResourceLocation(ID, "ns_soc");
 
+    public static final ResourceLocation stop_on_client = new ResourceLocation(ID, "ns_st_oc");
+
     public static final ResourceLocation info_to_server = new ResourceLocation(ID, "ns_its");
+
+    public static final ResourceLocation stop_to_server = new ResourceLocation(ID, "ns_sts");
 
 
     public static void startTrack(ServerPlayer player, BlockPos pos, String url){
@@ -30,6 +34,15 @@ public class NetworkHandler {
         b.writeBlockPos(pos);
         b.writeUtf(url);
         ServerPlayNetworking.send(player, start_on_client, b);
+    }
+    public static void stopTrack(ServerPlayer player, BlockPos pos){
+        FriendlyByteBuf b = new FriendlyByteBuf(Unpooled.buffer());
+        b.writeBlockPos(pos);
+        ServerPlayNetworking.send(player, stop_on_client, b);
+    }
+
+    public static void skipTrack(ServerPlayer player, BlockPos pos){
+
     }
 
     public static void registerReceivers(){
@@ -41,6 +54,7 @@ public class NetworkHandler {
                     if(se.getCurrentURL() != null) {
                         FriendlyByteBuf b = new FriendlyByteBuf(Unpooled.buffer());
                         b.writeUtf(se.getCurrentURL());
+                        b.writeBlockPos(p);
                         if(se.isPlaylistPlaying){
                             writePlaylistData(se, b);
                         } else writeTrackData(se, b);
@@ -51,21 +65,35 @@ public class NetworkHandler {
         });
         ServerPlayNetworking.registerGlobalReceiver(info_to_server, (server, player, handler, buf, responseSender) -> {
             BlockPos p = buf.readBlockPos();
+            String url = buf.readUtf();
+            boolean flag = buf.readBoolean();
+            List<SpeakerEntity.ServerTrackData> list = new ArrayList<>();
+            long duration = 0;
+            if(flag){
+                int size = buf.readVarInt();
+                for (int i = 0; i < size; i++) {
+                    list.add(new SpeakerEntity.ServerTrackData(buf.readVarLong()));
+                }
+            } else {
+                duration = buf.readVarLong();
+            }
+            long finalDuration = duration;
             server.execute(() -> {
                 BlockEntity e = player.level.getBlockEntity(p);
                 if(e instanceof SpeakerEntity se) {
-                    String url = buf.readUtf();
-                    if (buf.readBoolean()) {
-                        int size = buf.readVarInt();
-                        List<SpeakerEntity.ServerTrackData> list = new ArrayList<>();
-                        for (int i = 0; i < size; i++) {
-                            list.add(new SpeakerEntity.ServerTrackData(buf.readVarLong()));
-                        }
+                    if (flag) {
                         se.processPlaylistOnServer(url, list);
                     } else {
-                        long duration = buf.readVarLong();
-                        se.processTrackOnServer(url, duration);
+                        se.processTrackOnServer(url, finalDuration);
                     }
+                }
+            });
+        });
+        ServerPlayNetworking.registerGlobalReceiver(stop_to_server, (server, player, handler, buf, responseSender) -> {
+            BlockPos p = buf.readBlockPos();
+            server.execute(() -> {
+                if(player.level.getBlockEntity(p) instanceof SpeakerEntity se){
+                    se.processStopOnServer();
                 }
             });
         });
@@ -73,12 +101,12 @@ public class NetworkHandler {
 
     public static void writePlaylistData(SpeakerEntity se, FriendlyByteBuf buf){
         buf.writeBoolean(true);
+        buf.writeVarLong(se.getMs() + 1000);
         buf.writeVarInt(se.getPos());
-        buf.writeVarLong(se.getMs());
     }
 
     public static void writeTrackData(SpeakerEntity se, FriendlyByteBuf buf){
         buf.writeBoolean(false);
-        buf.writeVarLong(se.getMs());
+        buf.writeVarLong(se.getMs() + 1000);
     }
 }

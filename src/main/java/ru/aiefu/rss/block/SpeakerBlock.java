@@ -1,8 +1,6 @@
 package ru.aiefu.rss.block;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.TextComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -15,7 +13,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 import ru.aiefu.rss.RSS;
-import ru.aiefu.rss.SpeakerGui;
+import ru.aiefu.rss.RSSClient;
 
 
 public class SpeakerBlock extends BaseEntityBlock {
@@ -35,7 +33,7 @@ public class SpeakerBlock extends BaseEntityBlock {
         if(level.isClientSide){
             BlockEntity e = level.getBlockEntity(blockPos);
             if(e instanceof SpeakerEntity se)
-            Minecraft.getInstance().setScreen(new SpeakerGui(new TextComponent("Speaker Settings"), se));
+                RSSClient.openSpeakerScreen(se);
         }
         return InteractionResult.SUCCESS;
     }

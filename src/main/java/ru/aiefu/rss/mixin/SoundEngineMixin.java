@@ -14,8 +14,8 @@ import net.minecraft.client.sounds.WeighedSoundEvents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.phys.Vec3;
-import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.Marker;
+import org.slf4j.Logger;
+import org.slf4j.Marker;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -36,9 +36,6 @@ public abstract class SoundEngineMixin implements RemotePlayerAcc {
 
     @Shadow protected abstract float calculatePitch(SoundInstance soundInstance);
 
-    @Shadow @Final private static Marker MARKER;
-
-    @Shadow @Final private static Logger LOGGER;
 
     @Shadow @Final private List<SoundEventListener> listeners;
 
@@ -55,6 +52,10 @@ public abstract class SoundEngineMixin implements RemotePlayerAcc {
     @Shadow @Final private Multimap<SoundSource, SoundInstance> instanceBySource;
 
     @Shadow @Final private List<TickableSoundInstance> tickingSounds;
+
+    @Shadow @Final private static Marker MARKER;
+
+    @Shadow @Final private static Logger LOGGER;
 
     public void playRemoteStream(RemoteSoundInstance soundInstance){
         if (this.loaded) {

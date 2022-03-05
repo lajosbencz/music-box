@@ -17,20 +17,28 @@ public class NetworkHandlerClient {
 
     public static void registerClientReceivers(){
         ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.info_to_client, (client, handler, buf, responseSender) -> {
-            ClientLevel l = Minecraft.getInstance().level;
-            if(l != null){
-                BlockEntity e = l.getBlockEntity(buf.readBlockPos());
-                if(e instanceof SpeakerEntity se){
-                    String url = buf.readUtf();
-                    if(buf.readBoolean()){
-                        int pos = buf.readVarInt();
-                        long ms = System.currentTimeMillis() - buf.readVarLong();
-                        se.playPlaylistOnClient(url, ms, pos);
-                    } else {
-                        se.playTrackOnClient(url, System.currentTimeMillis() - buf.readVarLong());
+            String url = buf.readUtf();
+            BlockPos p = buf.readBlockPos();
+            boolean flag = buf.readBoolean();
+            long ms = System.currentTimeMillis() - buf.readVarLong();
+            int pos = 0;
+            if(flag){
+                pos = buf.readVarInt();
+            }
+            int finalPos = pos;
+            Minecraft.getInstance().execute(() -> {
+                ClientLevel l = Minecraft.getInstance().level;
+                if(l != null){
+                    BlockEntity e = l.getBlockEntity(p);
+                    if(e instanceof SpeakerEntity se){
+                        if(flag){
+                            se.playPlaylistOnClient(url, ms, finalPos);
+                        } else {
+                            se.playTrackOnClient(url, ms);
+                        }
                     }
                 }
-            }
+            });
         });
         ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.start_on_client, (client, handler, buf, responseSender) -> {
            ClientLevel l = Minecraft.getInstance().level;
@@ -40,6 +48,15 @@ public class NetworkHandlerClient {
                    se.startPlayer(buf.readUtf());
                }
            }
+        });
+        ClientPlayNetworking.registerGlobalReceiver(NetworkHandler.stop_on_client, (client, handler, buf, responseSender) -> {
+            ClientLevel l = Minecraft.getInstance().level;
+            if(l != null){
+                BlockEntity e = l.getBlockEntity(buf.readBlockPos());
+                if(e instanceof SpeakerEntity se){
+                    se.stopPlayer();
+                }
+            }
         });
     }
 }

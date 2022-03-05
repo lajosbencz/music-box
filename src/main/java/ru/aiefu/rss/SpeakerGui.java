@@ -23,6 +23,7 @@ public class SpeakerGui extends Screen {
     private int centerX, centerY;
     protected EditBox urlBox;
     protected Button doneButton;
+    protected Button stopButton;
     private final SpeakerEntity e;
 
     public SpeakerGui(Component component, SpeakerEntity e) {
@@ -35,13 +36,17 @@ public class SpeakerGui extends Screen {
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
 
-        this.urlBox = new EditBox(this.font, centerX, centerY, 300, 20, new TextComponent("Track url"));
+        this.urlBox = new EditBox(this.font, centerX - 150, centerY, 300, 20, new TextComponent("Track url"));
         this.urlBox.setMaxLength(2000);
         this.addWidget(urlBox);
+        String currentURL = e.getCurrentURL();
+        if(currentURL != null){
+            this.urlBox.setValue(currentURL);
+        }
         this.setInitialFocus(urlBox);
         this.urlBox.setFocus(true);
 
-        this.doneButton = this.addRenderableWidget(new Button(centerX, centerY - 20, 150, 20, CommonComponents.GUI_DONE, button -> {
+        this.doneButton = this.addRenderableWidget(new Button(centerX + 60, centerY + 25, 90, 20, new TextComponent("Play"), button -> {
             String url = urlBox.getValue();
             if(!url.isEmpty()) {
                 RSS.playerManager.loadItem(url, new AudioLoadResultHandler() {
@@ -67,6 +72,14 @@ public class SpeakerGui extends Screen {
                 });
             }
         }));
+        this.stopButton = this.addRenderableWidget(new Button(centerX - 45, centerY + 25, 90, 20, new TextComponent("Stop"), button -> sendStop()));
+        this.addRenderableWidget(new Button(centerX - 150, centerY + 25, 90, 20, CommonComponents.GUI_CANCEL, button -> this.onClose()));
+    }
+
+    private void sendStop(){
+        FriendlyByteBuf buf = new FriendlyByteBuf(Unpooled.buffer());
+        buf.writeBlockPos(e.getBlockPos());
+        ClientPlayNetworking.send(NetworkHandler.stop_to_server, buf);
     }
 
     private void sendTrackInfo(AudioTrack track, String url){
@@ -105,8 +118,13 @@ public class SpeakerGui extends Screen {
     @Override
     public void render(PoseStack poseStack, int i, int j, float f) {
         this.renderBackground(poseStack);
-
+        this.urlBox.render(poseStack, i, j, f);
         super.render(poseStack, i, j, f);
+    }
+
+    @Override
+    public boolean isPauseScreen() {
+        return false;
     }
 
     @Override

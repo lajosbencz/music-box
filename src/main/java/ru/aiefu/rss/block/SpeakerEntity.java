@@ -1,211 +1,75 @@
 package ru.aiefu.rss.block;
 
-import com.sedmelluq.discord.lavaplayer.format.AudioPlayerInputStream;
-import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
-import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
-import com.sedmelluq.discord.lavaplayer.player.event.AudioEventAdapter;
-import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
-import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
+import net.fabricmc.api.EnvType;
+import net.fabricmc.api.Environment;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
-import org.jetbrains.annotations.Nullable;
 import ru.aiefu.rss.RSS;
-import ru.aiefu.rss.RemotePlayerAcc;
-import ru.aiefu.rss.mixin.SoundEngineAcc;
 import ru.aiefu.rss.network.NetworkHandler;
 import ru.aiefu.rss.network.NetworkHandlerClient;
-import ru.aiefu.rss.sound.RemoteSoundInstance;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class SpeakerEntity extends BlockEntity {
 
     //Common Side stuff
-    private final UUID uuid;
     private String currentURL;
     private long ms, currentLength;
     public boolean isPlaylistPlaying;
     private int pos, size;
     private final List<ServerTrackData> stdList = new ArrayList<>();
 
-    //Client Side Stuff
-    private final AudioPlayer player = craftPlayer();
-    public boolean isPlayerListening;
-    private SoundInstance currentInstance;
-    private final ConcurrentLinkedQueue<AudioTrack> playlist = new ConcurrentLinkedQueue<>();
+    //Client Side
+    private boolean isPlayerListening;
 
-    private AudioPlayer craftPlayer(){
-        AudioPlayer p = RSS.playerManager.createPlayer();
-        p.addListener(new PlayerEventListener());
-        return p;
-    }
+    private MusicPlayerClient musicPlayer;
 
     public SpeakerEntity(BlockPos blockPos, BlockState blockState) {
         super(RSS.SPEAKER_ENTITY_TYPE, blockPos, blockState);
-        uuid = UUID.randomUUID();
-    }
-
-    @Override
-    public void load(CompoundTag compoundTag) {
-
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag compoundTag) {
-
-    }
-
-    @Nullable
-    @Override
-    public ClientboundBlockEntityDataPacket getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public CompoundTag getUpdateTag() {
-        CompoundTag tag = new CompoundTag();
-        tag.putUUID("player_id", uuid);
-        return tag;
-    }
-
-    public void playTrackOnClient(String currentURL, long seekTo){
-        this.currentURL = currentURL;
-        RSS.playerManager.loadItem(currentURL, new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                Minecraft.getInstance().execute(() -> {
-                    if(seekTo < track.getDuration()) {
-                        track.setPosition(seekTo);
-                        isPlaylistPlaying = false;
-                        player.playTrack(track);
-                        play();
-                    }
-                });
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-
-            }
-
-            @Override
-            public void noMatches() {
-
-            }
-
-            @Override
-            public void loadFailed(FriendlyException exception) {
-
-            }
-        });
-    }
-
-    public void playPlaylistOnClient(String currentURL, long seekTo, int pos){
-        this.currentURL = currentURL;
-        RSS.playerManager.loadItem(currentURL, new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-                Minecraft.getInstance().execute(() -> {
-                    List<AudioTrack> tracks = playlist.getTracks();
-                    if (pos > 0) {
-                        tracks.subList(0, pos).clear();
-                    }
-                    SpeakerEntity.this.playlist.addAll(tracks);
-                    AudioTrack track = SpeakerEntity.this.playlist.poll();
-                    if(track != null && seekTo < track.getDuration()) {
-                        track.setPosition(seekTo);
-                    } else {
-                        track = SpeakerEntity.this.playlist.poll();
-                    }
-                    if(track != null) {
-                        isPlaylistPlaying = true;
-                        player.playTrack(track);
-                        play();
-                    }
-                });
-            }
-
-            @Override
-            public void noMatches() {
-
-            }
-
-            @Override
-            public void loadFailed(FriendlyException exception) {
-
-            }
-        });
-    }
-
-    public void startPlayer(String url){
-        this.currentURL = url;
-        RSS.playerManager.loadItem(currentURL, new AudioLoadResultHandler() {
-            @Override
-            public void trackLoaded(AudioTrack track) {
-                isPlaylistPlaying = false;
-                player.playTrack(track);
-                play();
-            }
-
-            @Override
-            public void playlistLoaded(AudioPlaylist playlist) {
-                isPlaylistPlaying = true;
-                SpeakerEntity.this.playlist.addAll(playlist.getTracks());
-                player.playTrack(SpeakerEntity.this.playlist.poll());
-                play();
-            }
-
-            @Override
-            public void noMatches() {
-
-            }
-
-            @Override
-            public void loadFailed(FriendlyException exception) {
-
-            }
-        });
-    }
-
-    private void play(){
-        RemoteSoundInstance si = new RemoteSoundInstance(new ResourceLocation(RSS.MOD_ID,"lava-player-" + uuid.toString()), SoundSource.RECORDS, AudioPlayerInputStream.createStream(player, RSS.PCM_MONO_LE, 10000L, true), this.worldPosition);
-        currentInstance = si;
-        getSoundEngine().playRemoteStream(si);
-    }
-
-    public void stopPlayer() throws IOException {
-        if(currentInstance != null) {
-            player.stopTrack();
-            Minecraft.getInstance().getSoundManager().stop(currentInstance);
-            currentInstance = null;
+        if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT){
+            musicPlayer = new MusicPlayerClient(this);
         }
     }
 
+    @Environment(EnvType.CLIENT)
+    public void playTrackOnClient(String currentURL, long seekTo){
+        this.currentURL = currentURL;
+        musicPlayer.playTrackOnClient(currentURL, seekTo);
+    }
+    @Environment(EnvType.CLIENT)
+    public void playPlaylistOnClient(String currentURL, long seekTo, int pos){
+        this.currentURL = currentURL;
+        musicPlayer.playPlaylistOnClient(currentURL, seekTo, pos);
+    }
+    @Environment(EnvType.CLIENT)
+    public void startPlayer(String url){
+        this.isPlayerListening = true;
+        this.currentURL = url;
+        musicPlayer.startPlayer(url);
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void stopPlayer(){
+        musicPlayer.stopPlayer();
+    }
+
+    @Environment(EnvType.CLIENT)
+    public void terminatePlayer() {
+        musicPlayer.terminatePlayer();
+    }
+
+    @SuppressWarnings("unused")
     public static void serverTick(Level level, BlockPos pos, BlockState blockState, SpeakerEntity se){
         if(se.isPlaylistPlaying && RSS.currentTimeMS > se.currentLength){
             if(se.pos + 1 < se.size){
@@ -217,9 +81,14 @@ public class SpeakerEntity extends BlockEntity {
     }
 
     public static void clientTick(Level level, BlockPos pos, BlockState blockState, SpeakerEntity se){
-        if(!se.isPlayerListening && level.getGameTime() % 20 == 0 && Minecraft.getInstance().player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) < 4096){
-            se.isPlayerListening = true;
-            NetworkHandlerClient.requestAudioInfo(se.getBlockPos());
+        if(level.getGameTime() % 20 == 0 ) {
+            if (!se.isPlayerListening && Minecraft.getInstance().player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) < 4096) {
+                se.isPlayerListening = true;
+                NetworkHandlerClient.requestAudioInfo(se.getBlockPos());
+            } else if (se.isPlayerListening && Minecraft.getInstance().player.distanceToSqr(pos.getX(), pos.getY(), pos.getZ()) > 4095){
+                se.isPlayerListening = false;
+                se.terminatePlayer();
+            }
         }
     }
 
@@ -232,7 +101,7 @@ public class SpeakerEntity extends BlockEntity {
         this.size = stdList.size();
         ms = RSS.currentTimeMS;
         currentLength = stdList.get(0).ms + ms;
-        notifyAround();
+        notifyAround(Action.START);
     }
 
     public void processTrackOnServer(String url, long duration){
@@ -243,16 +112,30 @@ public class SpeakerEntity extends BlockEntity {
         this.size = 0;
         ms = RSS.currentTimeMS;
         currentLength = ms + duration;
-        notifyAround();
+        notifyAround(Action.START);
     }
 
-    private void notifyAround(){
+    public void processStopOnServer(){
+        currentURL = null;
+        isPlaylistPlaying = false;
+        stdList.clear();
+        this.pos = 0;
+        this.size = 0;
+        notifyAround(Action.STOP);
+    }
+
+    private void notifyAround(Action action){
         int range = 64;
         int x = worldPosition.getX();
         int y = worldPosition.getY();
         int z = worldPosition.getZ();
         List<ServerPlayer> players = level.getEntities(EntityTypeTest.forClass(ServerPlayer.class), new AABB(x - range, y - range, z - range,x + range, y + range, z + range), p -> true);
-        players.forEach(p -> NetworkHandler.startTrack(p, worldPosition, currentURL));
+        if(action == Action.START) {
+            players.forEach(p -> NetworkHandler.startTrack(p, worldPosition, currentURL));
+        }
+        else if(action == Action.STOP){
+            players.forEach(p -> NetworkHandler.stopTrack(p, worldPosition));
+        }
     }
 
     @SuppressWarnings("unused")
@@ -284,31 +167,15 @@ public class SpeakerEntity extends BlockEntity {
         return currentURL;
     }
 
-    public static RemotePlayerAcc getSoundEngine(){
-        return (RemotePlayerAcc) ((SoundEngineAcc)Minecraft.getInstance().getSoundManager()).getSoundEngine();
+    public void setCurrentURL(String currentURL) {
+        this.currentURL = currentURL;
     }
 
-    public class PlayerEventListener extends AudioEventAdapter{
-        @Override
-        public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
-            if(SpeakerEntity.this.isPlaylistPlaying){
-                Minecraft.getInstance().execute(() -> {
-                    SpeakerEntity.this.player.playTrack(SpeakerEntity.this.playlist.poll());
-                    SpeakerEntity.this.play();
-                });
-            }
-        }
-
-        @Override
-        public void onTrackException(AudioPlayer player, AudioTrack track, FriendlyException exception) {
-            super.onTrackException(player, track, exception);
-        }
-
-        @Override
-        public void onTrackStuck(AudioPlayer player, AudioTrack track, long thresholdMs) {
-            super.onTrackStuck(player, track, thresholdMs);
-        }
-    }
     public record ServerTrackData(long ms){
+    }
+    public enum Action{
+        START,
+        STOP,
+        SKIP
     }
 }
