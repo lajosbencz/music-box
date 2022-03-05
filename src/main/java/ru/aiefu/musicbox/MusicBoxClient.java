@@ -1,15 +1,13 @@
-package ru.aiefu.rss;
+package ru.aiefu.musicbox;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
-import ru.aiefu.rss.block.SpeakerEntity;
-import ru.aiefu.rss.network.NetworkHandlerClient;
+import ru.aiefu.musicbox.block.SpeakerEntity;
+import ru.aiefu.musicbox.network.NetworkHandlerClient;
 
-import java.io.IOException;
-
-public class RSSClient implements ClientModInitializer {
+public class MusicBoxClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         NetworkHandlerClient.registerClientReceivers();

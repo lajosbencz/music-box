@@ -1,4 +1,4 @@
-package ru.aiefu.rss.network;
+package ru.aiefu.musicbox.network;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
@@ -7,7 +7,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import ru.aiefu.rss.block.SpeakerEntity;
+import ru.aiefu.musicbox.block.SpeakerEntity;
 
 public class NetworkHandlerClient {
 

@@ -1,4 +1,4 @@
-package ru.aiefu.rss.block;
+package ru.aiefu.musicbox.block;
 
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import com.sedmelluq.discord.lavaplayer.format.AudioPlayerInputStream;
@@ -15,10 +15,10 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.sounds.SoundInstance;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundSource;
-import ru.aiefu.rss.RSS;
-import ru.aiefu.rss.RemotePlayerAcc;
-import ru.aiefu.rss.mixin.SoundEngineAcc;
-import ru.aiefu.rss.sound.RemoteSoundInstance;
+import ru.aiefu.musicbox.MusicBox;
+import ru.aiefu.musicbox.RemotePlayerAcc;
+import ru.aiefu.musicbox.mixin.SoundEngineAcc;
+import ru.aiefu.musicbox.sound.RemoteSoundInstance;
 
 import java.util.List;
 import java.util.UUID;
@@ -43,7 +43,7 @@ public class MusicPlayerClient {
     private final ConcurrentLinkedQueue<AudioTrack> playlist = new ConcurrentLinkedQueue<>();
 
     private AudioPlayer craftPlayer(){
-        AudioPlayer p = RSS.playerManager.createPlayer();
+        AudioPlayer p = MusicBox.playerManager.createPlayer();
         p.addListener(new PlayerEventListener());
         return p;
     }
@@ -55,7 +55,7 @@ public class MusicPlayerClient {
 
     @Environment(EnvType.CLIENT)
     public void playTrackOnClient(String currentURL, long seekTo){
-        RSS.playerManager.loadItem(currentURL, new AudioLoadResultHandler() {
+        MusicBox.playerManager.loadItem(currentURL, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 Minecraft.getInstance().execute(() -> {
@@ -87,7 +87,7 @@ public class MusicPlayerClient {
     }
 
     public void playPlaylistOnClient(String currentURL, long seekTo, int pos){
-        RSS.playerManager.loadItem(currentURL, new AudioLoadResultHandler() {
+        MusicBox.playerManager.loadItem(currentURL, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
 
@@ -130,7 +130,7 @@ public class MusicPlayerClient {
     }
     @Environment(EnvType.CLIENT)
     public void startPlayer(String url){
-        RSS.playerManager.loadItem(url, new AudioLoadResultHandler() {
+        MusicBox.playerManager.loadItem(url, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack track) {
                 Minecraft.getInstance().execute(() -> {
@@ -166,7 +166,7 @@ public class MusicPlayerClient {
         stopInstance();
         executorService.schedule(() -> Minecraft.getInstance().execute(() -> {
             player.playTrack(track);
-            RemoteSoundInstance si = new RemoteSoundInstance(new ResourceLocation(RSS.MOD_ID,"lava-player-" + uuid.toString()), SoundSource.RECORDS, AudioPlayerInputStream.createStream(player, RSS.PCM_MONO_LE, 10000L, true), this.se.getBlockPos());
+            RemoteSoundInstance si = new RemoteSoundInstance(new ResourceLocation(MusicBox.MOD_ID,"lava-player-" + uuid.toString()), SoundSource.RECORDS, AudioPlayerInputStream.createStream(player, MusicBox.PCM_MONO_LE, 10000L, true), this.se.getBlockPos());
             getSoundEngine().playRemoteStream(si);
             currentInstance = si;
         }), 1200L, TimeUnit.MILLISECONDS);

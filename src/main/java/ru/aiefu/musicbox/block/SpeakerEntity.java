@@ -1,4 +1,4 @@
-package ru.aiefu.rss.block;
+package ru.aiefu.musicbox.block;
 
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -14,9 +14,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
-import ru.aiefu.rss.RSS;
-import ru.aiefu.rss.network.NetworkHandler;
-import ru.aiefu.rss.network.NetworkHandlerClient;
+import ru.aiefu.musicbox.MusicBox;
+import ru.aiefu.musicbox.network.NetworkHandler;
+import ru.aiefu.musicbox.network.NetworkHandlerClient;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,7 +36,7 @@ public class SpeakerEntity extends BlockEntity {
     private MusicPlayerClient musicPlayer;
 
     public SpeakerEntity(BlockPos blockPos, BlockState blockState) {
-        super(RSS.SPEAKER_ENTITY_TYPE, blockPos, blockState);
+        super(MusicBox.SPEAKER_ENTITY_TYPE, blockPos, blockState);
         if(FabricLoader.getInstance().getEnvironmentType() == EnvType.CLIENT){
             musicPlayer = new MusicPlayerClient(this);
         }
@@ -71,11 +71,11 @@ public class SpeakerEntity extends BlockEntity {
 
     @SuppressWarnings("unused")
     public static void serverTick(Level level, BlockPos pos, BlockState blockState, SpeakerEntity se){
-        if(se.isPlaylistPlaying && RSS.currentTimeMS > se.currentLength){
+        if(se.isPlaylistPlaying && MusicBox.currentTimeMS > se.currentLength){
             if(se.pos + 1 < se.size){
                 se.pos++;
-                se.ms = RSS.currentTimeMS;
-                se.currentLength = RSS.currentTimeMS + se.stdList.get(se.pos).ms;
+                se.ms = MusicBox.currentTimeMS;
+                se.currentLength = MusicBox.currentTimeMS + se.stdList.get(se.pos).ms;
             }
         }
     }
@@ -99,7 +99,7 @@ public class SpeakerEntity extends BlockEntity {
         stdList.addAll(data);
         this.pos = 0;
         this.size = stdList.size();
-        ms = RSS.currentTimeMS;
+        ms = MusicBox.currentTimeMS;
         currentLength = stdList.get(0).ms + ms;
         notifyAround(Action.START);
     }
@@ -110,7 +110,7 @@ public class SpeakerEntity extends BlockEntity {
         stdList.clear();
         this.pos = 0;
         this.size = 0;
-        ms = RSS.currentTimeMS;
+        ms = MusicBox.currentTimeMS;
         currentLength = ms + duration;
         notifyAround(Action.START);
     }

@@ -1,8 +1,8 @@
-package ru.aiefu.rss.sound;
+package ru.aiefu.musicbox.sound;
 
 import net.minecraft.client.sounds.AudioStream;
 import org.lwjgl.BufferUtils;
-import ru.aiefu.rss.RSS;
+import ru.aiefu.musicbox.MusicBox;
 
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioInputStream;
@@ -10,10 +10,10 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 
 public class RemoteStream implements AudioStream {
-    private static final int mcs3 = RSS.PCM_MONO_LE.maximumChunkSize() * 3;
+    private static final int mcs3 = MusicBox.PCM_MONO_LE.maximumChunkSize() * 3;
 
     private final AudioInputStream stream;
-    private final byte[] buf = new byte[RSS.PCM_MONO_LE.maximumChunkSize()];
+    private final byte[] buf = new byte[MusicBox.PCM_MONO_LE.maximumChunkSize()];
 
     public RemoteStream(AudioInputStream stream){
         this.stream = stream;

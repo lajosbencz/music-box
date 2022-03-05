@@ -1,4 +1,4 @@
-package ru.aiefu.rss.mixin;
+package ru.aiefu.musicbox.mixin;
 
 import net.minecraft.client.sounds.SoundEngine;
 import net.minecraft.client.sounds.SoundManager;

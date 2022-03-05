@@ -1,4 +1,4 @@
-package ru.aiefu.rss;
+package ru.aiefu.musicbox;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
@@ -15,8 +15,8 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
-import ru.aiefu.rss.block.SpeakerEntity;
-import ru.aiefu.rss.network.NetworkHandler;
+import ru.aiefu.musicbox.block.SpeakerEntity;
+import ru.aiefu.musicbox.network.NetworkHandler;
 
 public class SpeakerGui extends Screen {
 
@@ -49,7 +49,7 @@ public class SpeakerGui extends Screen {
         this.doneButton = this.addRenderableWidget(new Button(centerX + 60, centerY + 25, 90, 20, new TextComponent("Play"), button -> {
             String url = urlBox.getValue();
             if(!url.isEmpty()) {
-                RSS.playerManager.loadItem(url, new AudioLoadResultHandler() {
+                MusicBox.playerManager.loadItem(url, new AudioLoadResultHandler() {
                     @Override
                     public void trackLoaded(AudioTrack track) {
                         sendTrackInfo(track, url);

@@ -1,4 +1,4 @@
-package ru.aiefu.rss.network;
+package ru.aiefu.musicbox.network;
 
 import io.netty.buffer.Unpooled;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -7,14 +7,14 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import ru.aiefu.rss.RSS;
-import ru.aiefu.rss.block.SpeakerEntity;
+import ru.aiefu.musicbox.MusicBox;
+import ru.aiefu.musicbox.block.SpeakerEntity;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class NetworkHandler {
-    private static final String ID = RSS.MOD_ID;
+    private static final String ID = MusicBox.MOD_ID;
 
     public static final ResourceLocation request_client_info = new ResourceLocation(ID, "ns_rci");
 

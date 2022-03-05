@@ -1,4 +1,4 @@
-package ru.aiefu.rss.mixin;
+package ru.aiefu.musicbox.mixin;
 
 import com.google.common.collect.Multimap;
 import com.mojang.blaze3d.audio.Library;
@@ -19,9 +19,9 @@ import org.slf4j.Marker;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
-import ru.aiefu.rss.RemotePlayerAcc;
-import ru.aiefu.rss.sound.RemoteSoundInstance;
-import ru.aiefu.rss.sound.RemoteStream;
+import ru.aiefu.musicbox.RemotePlayerAcc;
+import ru.aiefu.musicbox.sound.RemoteSoundInstance;
+import ru.aiefu.musicbox.sound.RemoteStream;
 
 import java.util.List;
 import java.util.Map;

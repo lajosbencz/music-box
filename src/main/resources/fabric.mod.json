@@ -19,9 +19,11 @@
   "environment": "*",
   "entrypoints": {
     "main": [
-      "ru.aiefu.rss.RSS"
+      "ru.aiefu.musicbox.MusicBox"
     ],
-    "client": ["ru.aiefu.rss.RSSClient"]
+    "client": [
+      "ru.aiefu.musicbox.MusicBoxClient"
+    ]
   },
   "mixins": [
     "modid.mixins.json"

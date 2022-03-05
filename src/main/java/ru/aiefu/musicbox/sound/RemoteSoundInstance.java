@@ -1,4 +1,4 @@
-package ru.aiefu.rss.sound;
+package ru.aiefu.musicbox.sound;
 
 import net.minecraft.client.resources.sounds.AbstractSoundInstance;
 import net.minecraft.client.resources.sounds.Sound;

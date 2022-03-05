@@ -1,4 +1,4 @@
-package ru.aiefu.rss;
+package ru.aiefu.musicbox;
 
 import com.sedmelluq.discord.lavaplayer.format.AudioDataFormat;
 import com.sedmelluq.discord.lavaplayer.format.Pcm16AudioDataFormat;
@@ -18,18 +18,18 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Material;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import ru.aiefu.rss.block.SpeakerBlock;
-import ru.aiefu.rss.block.SpeakerEntity;
-import ru.aiefu.rss.network.NetworkHandler;
+import ru.aiefu.musicbox.block.SpeakerBlock;
+import ru.aiefu.musicbox.block.SpeakerEntity;
+import ru.aiefu.musicbox.network.NetworkHandler;
 
-public class RSS implements ModInitializer {
+public class MusicBox implements ModInitializer {
 	// This logger is used to write text to the console and the log file.
 	// It is considered best practice to use your mod id as the logger's name.
 	// That way, it's clear which mod wrote info, warnings, and errors.
 
-	public static final String MOD_ID = "rss";
+	public static final String MOD_ID = "musicbox";
 
-	public static final Logger LOGGER = LogManager.getLogger("Remote Sound Player");
+	public static final Logger LOGGER = LogManager.getLogger("Music Box");
 
 	public static final SpeakerBlock SPEAKER = new SpeakerBlock(FabricBlockSettings.of(Material.WOOD).strength(3.0F));
 
@@ -58,6 +58,6 @@ public class RSS implements ModInitializer {
 
 		Registry.register(Registry.BLOCK, new ResourceLocation(MOD_ID, "speaker"), SPEAKER);
 		Registry.register(Registry.ITEM, new ResourceLocation(MOD_ID, "speaker_block"), new BlockItem(SPEAKER, new FabricItemSettings()));
-		SPEAKER_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, "rss:speaker_entity", FabricBlockEntityTypeBuilder.create(SpeakerEntity::new, SPEAKER).build(null));
+		SPEAKER_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, "musicbox:speaker_entity", FabricBlockEntityTypeBuilder.create(SpeakerEntity::new, SPEAKER).build(null));
 	}
 }

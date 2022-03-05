@@ -1,0 +1,7 @@
+{
+  "parent": "block/cube_top",
+  "textures": {
+    "top": "musicbox:block/speaker_top",
+    "side": "musicbox:block/speaker_side"
+  }
+}
