@@ -15,6 +15,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import ru.aiefu.musicbox.block.SpeakerEntity;
 import ru.aiefu.musicbox.network.NetworkHandler;
 
@@ -46,7 +47,7 @@ public class SpeakerGui extends Screen {
         this.setInitialFocus(urlBox);
         this.urlBox.setFocus(true);
 
-        this.doneButton = this.addRenderableWidget(new Button(centerX + 60, centerY + 25, 90, 20, new TextComponent("Play"), button -> {
+        this.doneButton = this.addRenderableWidget(new Button(centerX + 60, centerY + 25, 90, 20, new TranslatableComponent("musicbox.gui.play"), button -> {
             String url = urlBox.getValue();
             if(!url.isEmpty()) {
                 MusicBox.playerManager.loadItem(url, new AudioLoadResultHandler() {
@@ -72,7 +73,7 @@ public class SpeakerGui extends Screen {
                 });
             }
         }));
-        this.stopButton = this.addRenderableWidget(new Button(centerX - 45, centerY + 25, 90, 20, new TextComponent("Stop"), button -> sendStop()));
+        this.stopButton = this.addRenderableWidget(new Button(centerX - 45, centerY + 25, 90, 20, new TranslatableComponent("musicbox.gui.stop"), button -> sendStop()));
         this.addRenderableWidget(new Button(centerX - 150, centerY + 25, 90, 20, CommonComponents.GUI_CANCEL, button -> this.onClose()));
     }
 
