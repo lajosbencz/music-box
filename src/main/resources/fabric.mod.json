@@ -3,17 +3,16 @@
   "id": "musicbox",
   "version": "${version}",
 
-  "name": "Example Mod",
-  "description": "This is an example description! Tell everyone what your mod is about!",
+  "name": "Music Box",
+  "description": "Play music from youtube or soundcloud in game world",
   "authors": [
-    "Me!"
+    "CmdrJane a.k.a Aiefu"
   ],
   "contact": {
-    "homepage": "https://fabricmc.net/",
-    "sources": "https://github.com/FabricMC/fabric-example-mod"
+    "sources": "https://github.com/CmdrJane/music-box"
   },
 
-  "license": "CC0-1.0",
+  "license": "MIT",
   "icon": "assets/musicbox/icon.png",
 
   "environment": "*",
