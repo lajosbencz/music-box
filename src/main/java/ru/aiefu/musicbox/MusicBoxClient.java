@@ -2,6 +2,7 @@ package ru.aiefu.musicbox;
 
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerBlockEntityEvents;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.TextComponent;
 import ru.aiefu.musicbox.block.SpeakerEntity;
