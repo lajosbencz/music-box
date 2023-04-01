@@ -3,7 +3,7 @@ package ru.aiefu.musicbox;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientBlockEntityEvents;
 import net.minecraft.client.Minecraft;
-import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.Component;
 import ru.aiefu.musicbox.block.SpeakerEntity;
 import ru.aiefu.musicbox.network.NetworkHandlerClient;
 
@@ -18,6 +18,6 @@ public class MusicBoxClient implements ClientModInitializer {
         });
     }
     public static void openSpeakerScreen(SpeakerEntity se){
-        Minecraft.getInstance().setScreen(new SpeakerGui(new TextComponent("Speaker Settings"), se));
+        Minecraft.getInstance().setScreen(new SpeakerGui(Component.literal("Speaker Settings"), se));
     }
 }

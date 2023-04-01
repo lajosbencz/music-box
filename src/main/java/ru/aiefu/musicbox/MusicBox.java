@@ -12,8 +12,10 @@ import net.fabricmc.fabric.api.item.v1.FabricItemSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.FabricBlockSettings;
 import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Material;
 import org.apache.logging.log4j.LogManager;
@@ -56,8 +58,8 @@ public class MusicBox implements ModInitializer {
 		playerManager.getConfiguration().setOutputFormat(PCM_MONO_LE);
 		NetworkHandler.registerReceivers();
 
-		Registry.register(Registry.BLOCK, new ResourceLocation(MOD_ID, "speaker"), SPEAKER);
-		Registry.register(Registry.ITEM, new ResourceLocation(MOD_ID, "speaker_block"), new BlockItem(SPEAKER, new FabricItemSettings()));
-		SPEAKER_ENTITY_TYPE = Registry.register(Registry.BLOCK_ENTITY_TYPE, "musicbox:speaker_entity", FabricBlockEntityTypeBuilder.create(SpeakerEntity::new, SPEAKER).build(null));
+		Registry.register(Registries.BLOCK, new ResourceLocation(MOD_ID, "speaker"), SPEAKER);
+		Registry.register(Registries.ITEM, new ResourceLocation(MOD_ID, "speaker_block"), new BlockItem(SPEAKER, new FabricItemSettings()));
+		SPEAKER_ENTITY_TYPE = Registry.register(Registries.BLOCK_ENTITY_TYPE, "musicbox:speaker_entity", FabricBlockEntityTypeBuilder.create(SpeakerEntity::new, SPEAKER).build(null));
 	}
 }

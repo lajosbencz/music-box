@@ -10,12 +10,11 @@ import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
+import net.minecraft.client.gui.components.Button.OnPress;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
 import ru.aiefu.musicbox.block.SpeakerEntity;
 import ru.aiefu.musicbox.network.NetworkHandler;
 
@@ -37,7 +36,7 @@ public class SpeakerGui extends Screen {
         this.centerX = this.width / 2;
         this.centerY = this.height / 2;
 
-        this.urlBox = new EditBox(this.font, centerX - 150, centerY, 300, 20, new TextComponent("Track url"));
+        this.urlBox = new EditBox(this.font, centerX - 150, centerY, 300, 20, Component.literal("Track url"));
         this.urlBox.setMaxLength(2000);
         this.addWidget(urlBox);
         String currentURL = e.getCurrentURL();
@@ -45,9 +44,9 @@ public class SpeakerGui extends Screen {
             this.urlBox.setValue(currentURL);
         }
         this.setInitialFocus(urlBox);
-        this.urlBox.setFocus(true);
+        this.urlBox.setFocused(true);
 
-        this.doneButton = this.addRenderableWidget(new Button(centerX + 60, centerY + 25, 90, 20, new TranslatableComponent("musicbox.gui.play"), button -> {
+        OnPress cb1 = button -> {
             String url = urlBox.getValue();
             if(!url.isEmpty()) {
                 MusicBox.playerManager.loadItem(url, new AudioLoadResultHandler() {
@@ -72,9 +71,16 @@ public class SpeakerGui extends Screen {
                     }
                 });
             }
-        }));
-        this.stopButton = this.addRenderableWidget(new Button(centerX - 45, centerY + 25, 90, 20, new TranslatableComponent("musicbox.gui.stop"), button -> sendStop()));
-        this.addRenderableWidget(new Button(centerX - 150, centerY + 25, 90, 20, CommonComponents.GUI_CANCEL, button -> this.onClose()));
+        };
+        Button btn1 = Button.builder(Component.translatable("musicbox.gui.play"), cb1).bounds(centerX + 60, centerY + 25, 90, 20).build();
+        this.doneButton = this.addRenderableWidget(btn1);
+        
+        OnPress cb2 =  button -> sendStop();
+        Button btn2 = Button.builder(Component.translatable("musicbox.gui.stop"), cb2).bounds(centerX - 45, centerY + 25, 90, 20).build();
+        this.stopButton = this.addRenderableWidget(btn2);
+
+        Button btn3 = Button.builder(CommonComponents.GUI_CANCEL, button -> this.onClose()).bounds(centerX - 150, centerY + 25, 90, 20).build();
+        this.addRenderableWidget(btn3);
     }
 
     private void sendStop(){
